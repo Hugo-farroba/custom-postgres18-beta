@@ -20,7 +20,13 @@ RUN set -ex; \
 WORKDIR /build/postgresql-${PG_VERSION}
 
 RUN set -ex; \
-    ./configure --prefix=/usr/lib/postgresql/$PG_MAJOR; \
+    ./configure \
+        --prefix=/usr/lib/postgresql/$PG_MAJOR \
+        --with-openssl \
+        --with-readline \
+        --with-zlib \
+        --with-icu \
+        --enable-thread-safety; \
     make -j $(( $( (echo 2;grep -c ^processor /proc/cpuinfo||:;)|sort -n|tail -1) - 1 )); \
     make install DESTDIR=/build/postgres
 
@@ -49,7 +55,7 @@ ENV PATH=$PATH:/usr/lib/postgresql/$PG_MAJOR/bin
 # Install lib dependencies (including C++ for pgvector)
 RUN set -ex; \
     apt-get update; \
-    apt-get install -y --no-install-recommends libreadline8 zlib1g libicu72 libstdc++6; \
+    apt-get install -y --no-install-recommends libreadline8 zlib1g libicu72 libstdc++6 libssl3; \
     rm -rf /var/lib/apt/lists/*
 
 # Most of the below is ripped from https://github.com/docker-library/postgres/blob/master/Dockerfile-debian.template
@@ -116,8 +122,6 @@ RUN sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /usr/lib/
 
 COPY --from=build /build/scripts/docker-entrypoint.sh /build/scripts/docker-ensure-initdb.sh /usr/local/bin/
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
-
-STOPSIGNAL SIGINT
 
 ENTRYPOINT ["wrapper.sh"]
 CMD ["postgres", "--port=5432"]
