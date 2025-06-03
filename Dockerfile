@@ -5,7 +5,7 @@ ENV PG_MAJOR=18
 
 RUN set -ex; \
     apt-get update; \
-    apt-get install -y curl tar git build-essential pkg-config flex bison libreadline-dev zlib1g-dev libicu-dev
+    apt-get install -y curl tar git build-essential pkg-config flex bison libreadline-dev zlib1g-dev libicu-dev libssl-dev
 
 WORKDIR /build
 
