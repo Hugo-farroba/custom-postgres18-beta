@@ -95,8 +95,18 @@ RUN set -eux; \
     ; \
     rm -rf /var/lib/apt/lists/*
 
+# Install OpenSSL and sudo
+RUN apt-get update && apt-get install -y openssl sudo
+
+# Allow the postgres user to execute certain commands as root without a password
+RUN echo "postgres ALL=(root) NOPASSWD: /usr/bin/mkdir, /bin/chown, /usr/bin/openssl" > /etc/sudoers.d/postgres
+
 RUN mkdir /docker-entrypoint-initdb.d
-COPY init-pgvector.sql /docker-entrypoint-initdb.d/
+
+# Add init scripts while setting permissions
+COPY --chmod=755 init-pgvector.sql /docker-entrypoint-initdb.d/init-pgvector.sql
+COPY --chmod=755 init-ssl.sh /docker-entrypoint-initdb.d/init-ssl.sh
+COPY --chmod=755 wrapper.sh /usr/local/bin/wrapper.sh
 
 ENV PGDATA=/var/lib/postgresql/data
 # this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
@@ -106,8 +116,8 @@ RUN sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /usr/lib/
 
 COPY --from=build /build/scripts/docker-entrypoint.sh /build/scripts/docker-ensure-initdb.sh /usr/local/bin/
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
 
 STOPSIGNAL SIGINT
-EXPOSE 5432
-CMD ["postgres"]
+
+ENTRYPOINT ["wrapper.sh"]
+CMD ["postgres", "--port=5432"]

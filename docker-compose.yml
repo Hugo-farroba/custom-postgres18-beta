@@ -4,9 +4,19 @@ services:
     ports:
       - "5432:5432"
     environment:
+      - DATABASE_PUBLIC_URL="postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{PGDATABASE}}"
+      - DATABASE_URL="postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}"
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-somepassword}
       - POSTGRES_DB=${POSTGRES_DB:-postgres18}
+      - PGDATA="/var/lib/postgresql/data/pgdata"
+      - PGDATABASE="${{POSTGRES_DB}}"
+      - PGHOST="${{RAILWAY_PRIVATE_DOMAIN}}"
+      - PGPASSWORD="${{POSTGRES_PASSWORD}}"
+      - PGPORT="5432"
+      - PGUSER="${{POSTGRES_USER}}"
+      - SSL_CERT_DAYS="820"
+      - RAILWAY_DEPLOYMENT_DRAINING_SECONDS="60"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     
