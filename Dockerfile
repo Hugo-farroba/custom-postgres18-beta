@@ -101,7 +101,6 @@ COPY init-pgvector.sql /docker-entrypoint-initdb.d/
 ENV PGDATA=/var/lib/postgresql/data
 # this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
 RUN install --verbose --directory --owner postgres --group postgres --mode 1777 "$PGDATA"
-VOLUME /var/lib/postgresql/data
 
 RUN sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /usr/lib/postgresql/$PG_MAJOR/share/postgresql.conf.sample
 
