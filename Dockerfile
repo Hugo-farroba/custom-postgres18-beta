@@ -1,4 +1,4 @@
-FROM debian:stable AS build
+FROM debian:12 AS build
 ARG PG_VERSION=18beta1
 ARG PGVECTOR_VERSION=master
 ENV PG_MAJOR=18
@@ -46,7 +46,7 @@ RUN set -ex; \
     cp /usr/lib/postgresql/$PG_MAJOR/lib/vector.so /build/postgres/usr/lib/postgresql/$PG_MAJOR/lib/; \
     cp /usr/lib/postgresql/$PG_MAJOR/share/extension/vector* /build/postgres/usr/lib/postgresql/$PG_MAJOR/share/extension/
 
-FROM debian:stable-slim AS final
+FROM debian:12-slim AS final
 
 ENV PG_MAJOR=18
 COPY --from=build /build/postgres /
