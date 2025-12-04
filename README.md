@@ -1,6 +1,6 @@
-# Postgres 18 Beta + PG Vector Dockerfile
+# Postgres 18 + pgvector Dockerfile
 
-Builds a Postgres 18 beta with PG Vector from source so that it can be tested using docker.
+Builds PostgreSQL 18 (stable) with pgvector from source for deployment.
 
 To use, clone this repo locally, open a terminal in the repo directory and run `docker compose up -d --build`.
 
